@@ -71,3 +71,29 @@ def pregunta_01():
 
 
     """
+    import os
+    import zipfile
+    import pandas as pd
+
+    with zipfile.ZipFile("files/input.zip", "r") as zip_ref:
+        zip_ref.extractall("files")
+
+    os.makedirs("files/output", exist_ok=True)
+
+    for dataset in ["train", "test"]:
+        data = []
+
+        for target in ["negative", "neutral", "positive"]:
+            path = os.path.join("files", "input", dataset, target)
+
+            for filename in sorted(os.listdir(path)):
+                if filename.endswith(".txt"):
+                    filepath = os.path.join(path, filename)
+
+                    with open(filepath, "r", encoding="utf-8") as file:
+                        phrase = file.read().strip()
+
+                    data.append({"phrase": phrase, "target": target})
+
+        df = pd.DataFrame(data)
+        df.to_csv(f"files/output/{dataset}_dataset.csv", index=False)
